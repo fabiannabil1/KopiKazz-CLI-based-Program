@@ -37,8 +37,8 @@ def Fitur_read_petani(file,role): # Paginiation parameter berbentuk list
         def pilihan_halaman(n=1,pesan=""):
             clear()
             header()
-            nama_kolom = list(file.columns)
-            a = tabulate.tabulate(tampilkan_per_halaman(n),headers=nama_kolom,tablefmt="grid",showindex=False)
+            # nama_kolom = list(file.columns)
+            a = tabulate.tabulate(tampilkan_per_halaman(n),tablefmt="grid",showindex=False)
             print(a)
             if pesan == "":
                 print(f"Halaman {n}/{int(lihat_banyak_halaman(file))}")
@@ -90,8 +90,12 @@ def Fitur_data_petani(role): ## nanti buat pemisah akses fitur
             case '1' : # bua
                 Fitur_Create_Petani(role)
             case '2' : # Lihat
-                file = Koneksi_db.read_petani()
-                Fitur_read_petani(file,role)
+                try:
+                    file = Koneksi_db.read_petani()
+                    Fitur_read_petani(file,role)
+                except:
+                    print('Belum ada data')
+                    Fitur_data_petani()
             case '3' : # Update
                 Fitur_Update_Petani(role)
             case '4' : # Delete
@@ -170,11 +174,13 @@ def Fitur_Create_Petani(role):
             in_kota = input("Masukkan Kota (ID):") or 1
             try:
                 #Penentuan ID Alamat dan Insert
-                id_alamat = Koneksi_db.read_all_table(f"SELECT max(id_alamat) FROM alamat",2)
-                for a in id_alamat:
-                    id_alamat = list(a)
-                
-                id_alamat = int(str(id_alamat[0]+1))
+                try:
+                    id_alamat = Koneksi_db.read_all_table(f"SELECT max(id_alamat) FROM alamat",2)
+                    for a in id_alamat:
+                        id_alamat = list(a)
+                    id_alamat = id_alamat[0]+1
+                except:
+                    id_alamat = 3000
                 query_alamat = "INSERT INTO alamat(id_alamat,nama_jalan,id_desa,id_kecamatan,id_kota)" 
                 query_alamat = query_alamat + f" VALUES ({id_alamat},'{jalan}',{in_desa},{in_kecamatan},{in_kota})"
                 Koneksi_db.insert_to_db(query_alamat)
@@ -322,7 +328,6 @@ def Fitur_Update_Petani(role):
         else:
             Fitur_Update_Petani(role)
 
-Fitur_data_petani(1)
             
 # baca_tabel = Koneksi_db.read_all_table(f"select * from alamat where id_alamat = 1",2)
 # for a in baca_tabel:

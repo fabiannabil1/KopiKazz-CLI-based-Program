@@ -40,6 +40,7 @@ def read_petani(id=0): # Untuk Membaca Tabel Petani
     cur.execute(query=query)
     nama_kolom =[desc[0] for desc in cur.description]
     data = cur.fetchall()
+    
     tabel_data = pd.DataFrame(data)
     tabel_data.columns = nama_kolom
     # tabel_data = tabulate.tabulate(data,headers=nama_kolom,tablefmt="grid",showindex=False)
@@ -50,30 +51,34 @@ def read_admin():
     cur = connStr.cursor()
     query = """
     SELECT a.id_admin as ID, a.nama as "Nama Lengkap", b.nama_bkph as BKPH
-    FROM admin a JOIN bkph b on(a.id_bkph = b.id_bkph);"""
+    FROM admin a JOIN bkph b on(a.id_bkph = b.id_bkph)"""
     cur.execute(query=query)
     nama_kolom =[desc[0] for desc in cur.description]
     data = cur.fetchall()
-    #tabel_data = pd.DataFrame(data)
-    tabel_data = tabulate.tabulate(data,headers=nama_kolom,tablefmt="grid",showindex=False)
+    tabel_data = pd.DataFrame(data)
+    tabel_data.columns = nama_kolom
+    # tabel_data = tabulate.tabulate(data,headers=nama_kolom,tablefmt="grid",showindex=False)
     cur.close()
     return tabel_data 
 
-def read_tim():
+def read_tim(id=0):
     cur = connStr.cursor()
     query = """
     SELECT tt.id_tim_taksasi as ID, tt.nama as "Nama Lengkap", b.nama_bkph as BKPH
-    FROM tim_taksasi tt JOIN bkph b on(tt.id_bkph = b.id_bkph);"""
-    cur.execute(query=query)
+    FROM tim_taksasi tt JOIN bkph b on(tt.id_bkph = b.id_bkph)"""
+    if id > 0 :
+        query = query + f" WHERE tt.id_tim_taksasi = {id}"
+    cur.execute(query)
     nama_kolom =[desc[0] for desc in cur.description]
     data = cur.fetchall()
-    #tabel_data = pd.DataFrame(data)
-    tabel_data = tabulate.tabulate(data,headers=nama_kolom,tablefmt="grid",showindex=False)
+    tabel_data = pd.DataFrame(data)
+    tabel_data.columns = nama_kolom
+    # tabel_data = tabulate.tabulate(data,headers=nama_kolom,tablefmt="grid",showindex=False)
     cur.close()
     return tabel_data 
 
 
-def read_invoice():
+def read_invoice(id=0):
     cur = connStr.cursor()
     query = """
     SELECT i.id_invoice "ID", i.tanggal_terbit "Terbit",i.jatuh_tempo "Jatuh Tempo",
@@ -84,26 +89,28 @@ def read_invoice():
     JOIN admin a on(a.id_admin = i.id_admin) 
     JOIN status_tagihan st on(st.id_status_tagihan = i.id_status_tagihan)
     JOIN jenis_kopi jk on(p.id_kopi = jk.id_jenis_kopi)
-    Group by p.id_petani,i.id_invoice,jk.id_jenis_kopi,st.id_status_tagihan
-			"""
+    Group by p.id_petani,i.id_invoice,jk.id_jenis_kopi,st.id_status_tagihan"""
+    if id>0:
+        query = query + f" having i.id_invoice = {id}"
     cur.execute(query=query)
     nama_kolom =[desc[0] for desc in cur.description]
     data = cur.fetchall()
-    #tabel_data = pd.DataFrame(data)
-    tabel_data = tabulate.tabulate(data,headers=nama_kolom,tablefmt="grid",showindex=False)
+    tabel_data = pd.DataFrame(data)
+    tabel_data.columns = nama_kolom
+    # tabel_data = tabulate.tabulate(data,headers=nama_kolom,tablefmt="grid",showindex=False)
     cur.close()
     return tabel_data 
 
-def create_invoice(id_petani,id_pegawai,rentang_hari):
+def create_invoice(id_invoice,id_petani,rentang_hari,id_admin,id_status_tagihan):
     cur = connStr.cursor()
-    query = f"INSERT INTO invoice(tanggal_dikeluarkan,tanggal_jatuh_tempo,id_petani,id_pegawai) VALUES(now(),now()+'{rentang_hari} day',{id_petani},{id_pegawai})"
+    query = f"INSERT INTO invoice(id_invoice,tanggal_terbit,jatuh_tempo,id_petani,id_admin,id_status_tagihan) VALUES({id_invoice},now(),now()+'{rentang_hari} day',{id_petani},{id_admin},{id_status_tagihan})"
     cur.execute(query)
     connStr.commit()
     cur.close()
-    try:
-        print((id_petani))
-    except:
-        print("Data Gagal Ditambah")
+    # try:
+    #     print((id_petani))
+    # except:
+    #     print("Data Gagal Ditambah")
 
 def insert_to_db(query):
     cur = connStr.cursor()
@@ -111,8 +118,6 @@ def insert_to_db(query):
     cur.execute(query)
     connStr.commit()
     cur.close()
-
-
 
 
 
