@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ** Coffee Management System** is a comprehensive application designed to manage various aspects of coffee production and administration within the  organization. The system provides functionalities for managing farmers, coffee types, invoices, and administrative tasks. It is built to streamline operations, improve data accuracy, and enhance the overall efficiency of coffee production management.
+The **Coffee Management System** is a comprehensive application designed to manage various aspects of coffee production and administration within the  organization. The system provides functionalities for managing farmers, coffee types, invoices, and administrative tasks. It is built to streamline operations, improve data accuracy, and enhance the overall efficiency of coffee production management.
 
 ## Features
 
